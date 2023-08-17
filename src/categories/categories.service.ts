@@ -1,14 +1,19 @@
 import { PrismaService } from './../prisma/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { Body, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { PrismaExceptionFilter } from 'src/exceptions-filter/prisma.exception-filter';
 
 @Injectable()
 export class CategoriesService {
+  // eslint-disable-next-line prettier/prettier
   constructor(private prismaService: PrismaService) {}
 
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+  create(@Body() createCategoryDto: CreateCategoryDto) {
+    // DTO = Data Transfer Object
+    return this.prismaService.category.create({
+      data: createCategoryDto,
+    });
   }
 
   findAll() {
@@ -16,7 +21,7 @@ export class CategoriesService {
   }
 
   findOne(id: number) {
-    return this.prismaService.category.findUnique({
+    return this.prismaService.category.findUniqueOrThrow({
       where: {
         id,
       },
@@ -24,10 +29,19 @@ export class CategoriesService {
   }
 
   update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+    return this.prismaService.category.update({
+      where: {
+        id,
+      },
+      data: updateCategoryDto,
+    });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} category`;
+    return this.prismaService.category.delete({
+      where: {
+        id,
+      },
+    });
   }
 }
